@@ -1,0 +1,188 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+
+class MainPage extends StatelessWidget {
+  const MainPage({super.key});
+
+  Future<void> _scanBarcode(BuildContext context) async {
+    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+      "#ff6666",
+      "Cancel",
+      false,
+      ScanMode.BARCODE,
+    );
+
+    print('Scanned barcode: $barcodeScanRes');
+
+    // ignore: use_build_context_synchronously
+    _showProductInformation(context, barcodeScanRes);
+  }
+
+  void _showProductInformation(BuildContext context, String barcode) {
+    String productName;
+    double productPrice;
+
+    // Dummy mapping of barcode to product information
+
+    if (barcode == '123456789') {
+      productName = 'Bisket';
+      productPrice = 13.0;
+    } else if (barcode == '987654321') {
+      productName = 'Example Product';
+      productPrice = 20.0;
+    } else if (barcode == '8901058000290') {
+      productName = 'maggie';
+      productPrice = 1.0;
+    } else if (barcode == '8901972058650') {
+      productName = 'waffy';
+      productPrice = 5.0;
+    } else {
+      productName = 'Testing';
+      productPrice = 15.0;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Scanned Product Information'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Scanned Barcode: $barcode'),
+              const SizedBox(height: 10),
+              Text('Product Name: $productName'),
+              const SizedBox(height: 10),
+              Text('Product Price: \$${productPrice.toStringAsFixed(2)}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Add product to cart functionality (replace with your logic)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Product added to cart: $productName'),
+                  ),
+                );
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text('Add to Cart'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Main Page'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              // TODO: Show the cart contents (replace with your logic)
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Show Cart Contents'),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: ElevatedButton.icon(
+          onPressed: () {
+            _scanBarcode(context);
+          },
+          icon: const Icon(Icons.qr_code_rounded),
+          label: const Text('Scan Barcode'),
+        ),
+      ),
+    );
+  }
+}
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'cart_page.dart'; // Import the CartPage widget
+import 'package:badges/badges.dart'; // Import the badges package
+
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  List<Map<String, dynamic>> cart = [];
+
+  int cartItemCount = 0; // Initialize the cart item count
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Main Page'),
+        actions: [
+          Badge(
+            badgeContent: Text(cartItemCount.toString(), style: TextStyle(color: Colors.white)),
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CartPage(cart: cart)),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      body: Center(
+        child: ElevatedButton.icon(
+          onPressed: () {
+            _scanBarcode(context);
+          },
+          icon: const Icon(Icons.qr_code_rounded),
+          label: const Text('Scan Barcode'),
+        ),
+      ),
+    );
+  }
+
+  void _scanBarcode(BuildContext context) async {
+    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+      "#ff6666",
+      "Cancel",
+      false,
+      ScanMode.BARCODE,
+    );
+
+    _showProductInfoDialog(context, barcodeScanRes);
+  }
+
+  void _showProductInfoDialog(BuildContext context, String barcode) {
+    // Your existing code
+    // ...
+  }
+
+  void _addProductToCart(String productName, double productPrice) {
+    // Your existing code to add products to the cart
+    // ...
+
+    // Increment the cart item count
+    setState(() {
+      cartItemCount += 1;
+    });
+  }
+}
+
